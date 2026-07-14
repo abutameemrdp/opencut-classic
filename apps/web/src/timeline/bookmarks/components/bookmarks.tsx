@@ -86,14 +86,13 @@ export function TimelineBookmarksRow({
 			className="relative flex-1 overflow-hidden"
 			style={{ height: TIMELINE_BOOKMARK_ROW_HEIGHT_PX }}
 		>
-			<button
+			<div
 				className="relative w-full cursor-default select-none border-0 bg-transparent p-0"
 				style={{
 					height: TIMELINE_BOOKMARK_ROW_HEIGHT_PX,
 					width: `${dynamicTimelineWidth}px`,
 				}}
 				aria-label="Timeline ruler"
-				type="button"
 				onWheel={handleWheel}
 				onClick={(event) => {
 					if (!event.currentTarget.contains(event.target as Node)) return;
@@ -114,7 +113,7 @@ export function TimelineBookmarksRow({
 						onBookmarkMouseDown={onBookmarkMouseDown}
 					/>
 				))}
-			</button>
+			</div>
 		</div>
 	);
 }

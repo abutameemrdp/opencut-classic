@@ -17,6 +17,7 @@ import { FaDiscord } from "react-icons/fa6";
 import { ExportButton } from "./export-button";
 import { FeedbackPopover } from "@/feedback/components/feedback-popover";
 import { ThemeToggle } from "../theme-toggle";
+import { LanguageSwitcher } from "../language-switcher";
 import { DEFAULT_LOGO_URL } from "@/site/brand";
 import { SOCIAL_LINKS } from "@/site/social";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ export function EditorHeader() {
 			<nav className="flex items-center gap-2">
 				<FeedbackPopover />
 				<ExportButton />
+				<LanguageSwitcher />
 				<ThemeToggle />
 			</nav>
 		</header>

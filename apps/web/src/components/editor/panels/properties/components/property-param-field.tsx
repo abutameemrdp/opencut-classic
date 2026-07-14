@@ -24,6 +24,8 @@ import {
 import { usePropertyDraft } from "../hooks/use-property-draft";
 import { KeyframeToggle } from "./keyframe-toggle";
 import { Textarea } from "@/components/ui/textarea";
+import { FontPicker } from "@/components/ui/font-picker";
+import { useTranslations } from "next-intl";
 
 export function PropertyParamField({
 	param,
@@ -42,9 +44,10 @@ export function PropertyParamField({
 		onToggle: () => void;
 	};
 }) {
+	const t = useTranslations("Params");
 	return (
 		<SectionField
-			label={param.label}
+			label={t(param.key as any) || param.label}
 			beforeLabel={
 				keyframe && param.keyframable !== false ? (
 					<KeyframeToggle
@@ -138,26 +141,72 @@ function ParamInput({
 
 	if (param.type === "text") {
 		return (
-			<Textarea
+			<TextParamField
 				value={String(value)}
-				onChange={(event) => onPreview(event.currentTarget.value)}
-				onBlur={onCommit}
+				onPreview={onPreview}
+				onCommit={onCommit}
 			/>
 		);
 	}
 
 	if (param.type === "font") {
 		return (
-			<input
-				className="border-input bg-accent h-9 w-full rounded-md border px-3 text-sm outline-none"
+			<FontParamField
 				value={String(value)}
-				onChange={(event) => onPreview(event.currentTarget.value)}
-				onBlur={onCommit}
+				onPreview={onPreview}
+				onCommit={onCommit}
 			/>
 		);
 	}
 
 	return null;
+}
+
+function TextParamField({
+	value,
+	onPreview,
+	onCommit,
+}: {
+	value: string;
+	onPreview: (value: string) => void;
+	onCommit: () => void;
+}) {
+	const draft = usePropertyDraft({
+		displayValue: value,
+		parse: (input) => input,
+		onPreview,
+		onCommit,
+		supportsExpressions: false,
+	});
+
+	return (
+		<Textarea
+			value={draft.displayValue}
+			onFocus={draft.onFocus}
+			onChange={draft.onChange}
+			onBlur={draft.onBlur}
+		/>
+	);
+}
+
+function FontParamField({
+	value,
+	onPreview,
+	onCommit,
+}: {
+	value: string;
+	onPreview: (value: string) => void;
+	onCommit: () => void;
+}) {
+	return (
+		<FontPicker
+			defaultValue={value}
+			onValueChange={(newFont) => {
+				onPreview(newFont);
+				onCommit();
+			}}
+		/>
+	);
 }
 
 function NumberParamField({

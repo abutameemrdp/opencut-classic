@@ -435,6 +435,7 @@ export function Timeline() {
 			}
 			{...dragProps}
 			aria-label="Timeline"
+			dir="ltr"
 		>
 			<TimelineToolbar
 				zoomLevel={zoomLevel}

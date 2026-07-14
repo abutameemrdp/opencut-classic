@@ -1070,14 +1070,21 @@ function EffectsButton({
 	};
 
 	return (
-		<button
-			type="button"
+		<div
+			role="button"
+			tabIndex={0}
 			className="flex shrink-0 justify-center text-white cursor-pointer"
 			onMouseDown={(event) => event.stopPropagation()}
 			onClick={handleClick}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					handleClick(e as any);
+				}
+			}}
 		>
 			<HugeiconsIcon icon={MagicWand05Icon} size={12} />
-		</button>
+		</div>
 	);
 }
 

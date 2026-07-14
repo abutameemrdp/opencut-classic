@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ClockIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
 	Popover,
 	PopoverContent,
@@ -92,12 +93,13 @@ function useFeedback() {
 
 export function FeedbackPopover() {
 	const [open, setOpen] = useState(false);
+	const t = useTranslations("Editor");
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="outline" className="h-8">
-					Send feedback
+					{t("sendFeedback")}
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-80 p-0">

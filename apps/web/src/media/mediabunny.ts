@@ -46,21 +46,31 @@ export async function readVideoFile({
 
 		let thumbnailUrl: string | null = null;
 		if (canDecode) {
-			const sink = new VideoSampleSink(videoTrack);
-			const frame = await sink.getSample(1);
-			if (frame) {
-				try {
-					thumbnailUrl = renderThumbnailDataUrl({
-						width: videoTrack.displayWidth,
-						height: videoTrack.displayHeight,
-						draw: ({ context, width, height }) => {
-							frame.draw(context, 0, 0, width, height);
-						},
-					});
-				} finally {
-					frame.close();
-				}
-			}
+			thumbnailUrl = await new Promise<string | null>((resolve) => {
+				const video = document.createElement("video");
+				video.src = URL.createObjectURL(file);
+				video.currentTime = 0.1;
+				video.onseeked = () => {
+					try {
+						thumbnailUrl = renderThumbnailDataUrl({
+							width: video.videoWidth,
+							height: video.videoHeight,
+							draw: ({ context, width, height }) => {
+								context.drawImage(video, 0, 0, width, height);
+							},
+						});
+						resolve(thumbnailUrl);
+					} catch (e) {
+						resolve(null);
+					} finally {
+						URL.revokeObjectURL(video.src);
+					}
+				};
+				video.onerror = () => {
+					URL.revokeObjectURL(video.src);
+					resolve(null);
+				};
+			});
 		}
 
 		return {

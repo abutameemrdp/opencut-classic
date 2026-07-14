@@ -293,6 +293,7 @@ export async function resolveStickerIntrinsicSize({
 	const url = resolveStickerId({ stickerId });
 	return new Promise((resolve) => {
 		const img = new Image();
+		img.crossOrigin = "anonymous";
 		img.onload = () =>
 			resolve({ width: img.naturalWidth, height: img.naturalHeight });
 		img.onerror = () =>

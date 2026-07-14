@@ -115,6 +115,7 @@ async function collectNode({
 			opacity: 1,
 			blendMode: "normal",
 			effectPassGroups: [],
+			effect_pass_groups: [],
 			mask: null,
 		});
 		return;
@@ -127,6 +128,7 @@ async function collectNode({
 		items.push({
 			type: "sceneEffect",
 			effectPassGroups: [node.resolved.passes],
+			effect_pass_groups: [node.resolved.passes],
 		});
 		return;
 	}
@@ -173,6 +175,7 @@ async function collectNode({
 			opacity: 1,
 			blendMode: "normal",
 			effectPassGroups: [passes],
+			effect_pass_groups: [passes],
 			mask: null,
 		});
 		return;
@@ -269,6 +272,7 @@ async function collectVisualSourceNode({
 		opacity: node.resolved.opacity,
 		blendMode: node.params.blendMode ?? "normal",
 		effectPassGroups: node.resolved.effectPasses,
+		effect_pass_groups: node.resolved.effectPasses,
 		mask,
 	});
 	if (strokeLayer) {
@@ -320,6 +324,7 @@ function collectTextNode({
 		opacity: node.resolved.opacity,
 		blendMode: node.params.blendMode ?? "normal",
 		effectPassGroups: node.resolved.effectPasses,
+		effect_pass_groups: node.resolved.effectPasses,
 		mask: null,
 	});
 }
@@ -519,6 +524,7 @@ function buildMaskArtifacts({
 			opacity: 1,
 			blendMode: "normal",
 			effectPassGroups: [],
+			effect_pass_groups: [],
 			mask: null,
 		};
 	}

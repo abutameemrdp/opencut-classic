@@ -18,11 +18,13 @@ export type FrameItemDescriptor =
 			opacity: number;
 			blendMode: BlendMode;
 			effectPassGroups: EffectPass[][];
+			effect_pass_groups?: EffectPass[][];
 			mask: LayerMaskDescriptor | null;
 	  }
 	| {
 			type: "sceneEffect";
 			effectPassGroups: EffectPass[][];
+			effect_pass_groups?: EffectPass[][];
 	  };
 
 export type QuadTransformDescriptor = {

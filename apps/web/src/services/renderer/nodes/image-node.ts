@@ -31,10 +31,12 @@ export function loadImageSource({
 
 	const promise = (async (): Promise<CachedImageSource> => {
 		const image = new Image();
+		image.crossOrigin = "anonymous";
 
 		await new Promise<void>((resolve, reject) => {
 			image.onload = () => resolve();
-			image.onerror = () => reject(new Error("Image load failed"));
+			image.onerror = () =>
+				reject(new Error(`Failed to load image: ${url}`));
 			image.src = url;
 		});
 

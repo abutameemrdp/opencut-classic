@@ -149,9 +149,13 @@ function transformFreesoundResult(
 
 export async function GET(request: NextRequest) {
 	try {
-		const { limited } = await checkRateLimit({ request });
-		if (limited) {
-			return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+		try {
+			const { limited } = await checkRateLimit({ request });
+			if (limited) {
+				return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+			}
+		} catch (error) {
+			console.warn("Rate limit check failed, proceeding without it:", error);
 		}
 
 		const { searchParams } = new URL(request.url);

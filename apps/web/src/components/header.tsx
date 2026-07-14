@@ -24,29 +24,14 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "./ui/context-menu";
+import { useTranslations } from "next-intl";
 
 export function Header() {
+	const t = useTranslations("Landing");
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const closeMenu = () => setIsMenuOpen(false);
 
-	const links = [
-		{
-			label: "Roadmap",
-			href: "/roadmap",
-		},
-		{
-			label: "Contributors",
-			href: "/contributors",
-		},
-		{
-			label: "Sponsors",
-			href: "/sponsors",
-		},
-		{
-			label: "Blog",
-			href: "/blog",
-		},
-	];
+	const links: Array<{label: string, href: string}> = [];
 
 	return (
 		<header className="bg-background shadow-background/85 sticky top-0 z-10 shadow-[0_30px_35px_15px_rgba(0,0,0,1)]">
@@ -118,16 +103,10 @@ export function Header() {
 						</Button>
 					</div>
 					<div className="hidden items-center gap-3 md:flex">
-						<Link href={SOCIAL_LINKS.github}>
-							<Button className="bg-background text-sm" variant="outline">
-								<HugeiconsIcon icon={GithubIcon} className="size-4" />
-								40k+
-							</Button>
-						</Link>
 						<Link href="/projects">
 							<Button className="text-sm">
-								Projects
-								<ArrowRight className="size-4" />
+								{t("projects")}
+								<ArrowRight className="size-4 rtl:rotate-180" />
 							</Button>
 						</Link>
 						<ThemeToggle />

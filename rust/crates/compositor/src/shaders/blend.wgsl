@@ -132,11 +132,18 @@ fn fragment_main(input: VertexOutput) -> @location(0) vec4f {
     let base = textureSample(base_texture, base_sampler, input.tex_coord);
     let layer = textureSample(layer_texture, layer_sampler, input.tex_coord);
 
-    let blend_rgb_value = blend_rgb(base.rgb, layer.rgb, uniforms.blend_mode);
+    // Un-premultiply for color blending
+    let base_unpremul = select(base.rgb / base.a, vec3f(0.0), base.a == 0.0);
+    let layer_unpremul = select(layer.rgb / layer.a, vec3f(0.0), layer.a == 0.0);
+
+    let blend_rgb_value = blend_rgb(base_unpremul, layer_unpremul, uniforms.blend_mode);
     let out_alpha = layer.a + base.a * (1.0 - layer.a);
+    
+    // Porter-Duff compositing with blend mode for premultiplied output
     let out_rgb =
-        ((1.0 - layer.a) * base.rgb) +
-        (layer.a * ((1.0 - base.a) * layer.rgb + base.a * blend_rgb_value));
+        (1.0 - layer.a) * base.rgb +
+        (1.0 - base.a) * layer.rgb +
+        layer.a * base.a * blend_rgb_value;
 
     return vec4f(clamp01(out_rgb), out_alpha);
 }

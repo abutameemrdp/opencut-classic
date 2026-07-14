@@ -10,6 +10,7 @@ import { SoundsView } from "@/sounds/components/assets-view";
 import { StickersView } from "@/stickers/components/assets-view";
 import { TextView } from "@/text/components/assets-view";
 import { EffectsView } from "@/effects/components/assets-view";
+import { RecordView } from "@/recording";
 
 export function AssetsPanel() {
 	const { activeTab } = useAssetsPanelStore();
@@ -31,6 +32,7 @@ export function AssetsPanel() {
 				Adjustment view coming soon...
 			</div>
 		),
+		record: <RecordView />,
 		settings: <SettingsView />,
 	};
 

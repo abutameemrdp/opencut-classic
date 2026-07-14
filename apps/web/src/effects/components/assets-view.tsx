@@ -7,7 +7,9 @@ import { effectsRegistry, EFFECT_TARGET_ELEMENT_TYPES } from "@/effects";
 import { effectPreviewService } from "@/services/renderer/effect-preview";
 import { useEditor } from "@/editor/use-editor";
 import { buildEffectElement } from "@/timeline/element-utils";
+import { findTrackInSceneTracks } from "@/timeline/track-element-update";
 import type { EffectDefinition } from "@/effects/types";
+import { usePropertiesStore } from "@/components/editor/panels/properties/stores/properties-store";
 
 export function EffectsView() {
 	const effects = effectsRegistry.getAll();
@@ -57,6 +59,33 @@ function EffectItem({ effect }: { effect: EffectDefinition }) {
 	const editor = useEditor();
 
 	const handleAddToTimeline = useCallback(() => {
+		const selection = editor.selection.getSnapshot();
+		
+		// If exactly one element is selected, try to add the effect to it directly
+		if (selection.selectedElements.length === 1) {
+			const { trackId, elementId } = selection.selectedElements[0]!;
+			const track = findTrackInSceneTracks({
+				tracks: editor.scenes.getActiveScene().tracks,
+				trackId,
+			});
+			const element = track?.elements.find((e: any) => e.id === elementId);
+			
+			if (element && (element.type === "video" || element.type === "image" || element.type === "graphic")) {
+				editor.timeline.addClipEffect({
+					trackId,
+					elementId,
+					effectType: effect.type,
+				});
+				// Switch the properties panel to the effects tab
+				usePropertiesStore.getState().setActiveTab({
+					elementType: element.type,
+					tabId: "effects",
+				});
+				return;
+			}
+		}
+
+		// Fallback: add global effect track
 		const currentTime = editor.playback.getCurrentTime();
 		const element = buildEffectElement({
 			effectType: effect.type,

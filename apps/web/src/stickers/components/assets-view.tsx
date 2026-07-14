@@ -30,6 +30,7 @@ import {
 	HappyIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useTranslations } from "next-intl";
 
 export function StickersView() {
 	const {
@@ -42,6 +43,7 @@ export function StickersView() {
 		setSelectedCategory,
 		viewMode,
 	} = useStickersStore();
+	const t = useTranslations("Stickers");
 
 	useEffect(() => {
 		if (viewMode === "browse" && !browseContent) {
@@ -55,7 +57,7 @@ export function StickersView() {
 				<Input
 					size="sm"
 					variant="default"
-					placeholder="Search..."
+					placeholder={t("searchPlaceholder")}
 					value={searchQuery}
 					onChange={(e) => {
 						setSearchQuery({ query: e.target.value });
@@ -79,10 +81,10 @@ export function StickersView() {
 				variant="underline"
 				className="mt-2 flex min-h-0 flex-1 flex-col"
 			>
-				<TabsList aria-label="Sticker categories">
-					{Object.entries(STICKER_CATEGORIES).map(([key, label]) => (
+				<TabsList aria-label={t("tabName")}>
+					{Object.entries(STICKER_CATEGORIES).map(([key]) => (
 						<TabsTrigger key={key} value={key}>
-							{label}
+							{t(`categories.${key}`)}
 						</TabsTrigger>
 					))}
 				</TabsList>
@@ -133,7 +135,7 @@ function StickerRow({ items }: { items: StickerData[] }) {
 	);
 }
 
-function EmptyView({ message }: { message: string }) {
+function EmptyView({ message }: { message: string | { title: string; sub?: string } }) {
 	return (
 		<div className="bg-background flex h-full flex-col items-center justify-center gap-3 p-4">
 			<HugeiconsIcon
@@ -141,8 +143,8 @@ function EmptyView({ message }: { message: string }) {
 				className="text-muted-foreground size-10"
 			/>
 			<div className="flex flex-col gap-2 text-center">
-				<p className="text-lg font-medium">No stickers found</p>
-				<p className="text-muted-foreground text-sm text-balance">{message}</p>
+				<p className="text-lg font-medium">{typeof message === 'string' ? message : message.title}</p>
+				{(typeof message === 'string' ? null : message.sub) && <p className="text-muted-foreground text-sm text-balance">{(message as any).sub}</p>}
 			</div>
 		</div>
 	);
@@ -183,6 +185,7 @@ function StickersContentView() {
 		setSelectedCategory,
 		viewMode,
 	} = useStickersStore();
+	const t = useTranslations("Stickers");
 
 	if (viewMode === "search") {
 		if (isSearching) {
@@ -205,7 +208,7 @@ function StickersContentView() {
 					{isRegionSearch && <RegionBanner region={regionLabel} />}
 					<div className="flex items-center justify-between">
 						<span className="text-muted-foreground text-sm">
-							{searchResults.total} results
+							{searchResults.total} {t("results")}
 						</span>
 					</div>
 					<StickerGrid items={searchResults.items} />
@@ -215,7 +218,7 @@ function StickersContentView() {
 
 		// "all" tab search — sections are in browseContent, fall through to section rendering below
 		if (selectedCategory !== "all" && searchQuery) {
-			return <EmptyView message={`No stickers found for "${searchQuery}"`} />;
+			return <EmptyView message={{ title: t("noStickersFound"), sub: t("noStickersForQuery", { query: searchQuery }) } as any} />;
 		}
 	}
 
@@ -228,22 +231,27 @@ function StickersContentView() {
 	}
 
 	if (!browseContent?.sections.length) {
-		const categoryLabel = STICKER_CATEGORIES[selectedCategory];
-		return (
-			<EmptyView
-				message={
-					viewMode === "search"
-						? `No stickers found for "${searchQuery}"`
+		const categoryLabel = t(`categories.${selectedCategory}`);
+		const emptyProps = {
+			title: t("noStickersFound"),
+			sub: viewMode === "search"
+						? t("noStickersForQuery", { query: searchQuery })
 						: selectedCategory === "all"
-							? "No stickers available yet."
-							: `No stickers available in ${categoryLabel.toLowerCase()} yet.`
-				}
-			/>
+							? t("noStickersAvailable")
+							: t("noStickersInCategory", { category: categoryLabel.toLowerCase() })
+		};
+
+		return (
+			<div className="flex flex-col h-full">
+				{selectedCategory === "uploads" && <UploadStickerButton />}
+				<EmptyView message={emptyProps as any} />
+			</div>
 		);
 	}
 
 	return (
 		<div className="flex flex-col gap-4 pb-4">
+			{selectedCategory === "uploads" && <UploadStickerButton />}
 			{browseContent.sections.map((section) => (
 				<StickerSection
 					key={section.id}
@@ -267,6 +275,7 @@ function StickerSection({
 	onClearRecent: () => void;
 	onSeeAll: (category: StickerCategory) => void;
 }) {
+	const t = useTranslations("Stickers");
 	const hasHeader =
 		Boolean(section.title) || section.id === "recent" || section.action;
 
@@ -275,7 +284,13 @@ function StickerSection({
 			{hasHeader && (
 				<div className="flex items-center justify-between gap-2">
 					{section.title ? (
-						<p className="text-xs text-muted-foreground">{section.title}</p>
+						<p className="text-xs text-muted-foreground">
+							{section.id === "recent" 
+								? t("recentlyUsed") 
+								: STICKER_CATEGORIES[section.id as StickerCategory] 
+									? t(`categories.${section.id}`) 
+									: section.title}
+						</p>
 					) : (
 						<div />
 					)}
@@ -288,7 +303,7 @@ function StickerSection({
 								size="sm"
 								className="h-auto gap-1 p-0 text-xs text-muted-foreground"
 							>
-								Clear
+								{t("clear")}
 							</Button>
 						)}
 
@@ -301,7 +316,7 @@ function StickerSection({
 									onSeeAll(section.action?.category as StickerCategory);
 								}}
 							>
-								See all
+								{t("seeAll")}
 							</Button>
 						)}
 					</div>
@@ -450,6 +465,69 @@ function StickerItem({
 					<Spinner className="size-6 text-white" />
 				</div>
 			)}
+		</div>
+	);
+}
+
+function UploadStickerButton() {
+	const t = useTranslations("Stickers");
+	const { browseStickers } = useStickersStore();
+	const [isUploading, setIsUploading] = useState(false);
+
+	const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		setIsUploading(true);
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+
+			const res = await fetch("/api/stickers/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (!res.ok) {
+				throw new Error("Upload failed");
+			}
+
+			toast.success("Sticker uploaded successfully!");
+			// Refresh stickers list
+			await browseStickers();
+		} catch (error) {
+			console.error("Upload error:", error);
+			toast.error("Failed to upload sticker");
+		} finally {
+			setIsUploading(false);
+			// Reset input
+			e.target.value = "";
+		}
+	};
+
+	return (
+		<div className="mb-4">
+			<Button
+				variant="outline"
+				className="w-full relative"
+				disabled={isUploading}
+			>
+				{isUploading ? (
+					<>
+						<Spinner className="mr-2 size-4" />
+						{t("uploading")}
+					</>
+				) : (
+					t("uploadSticker")
+				)}
+				<input
+					type="file"
+					accept="image/*"
+					className="absolute inset-0 opacity-0 cursor-pointer"
+					onChange={handleFileSelect}
+					disabled={isUploading}
+				/>
+			</Button>
 		</div>
 	);
 }

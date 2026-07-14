@@ -1,7 +1,7 @@
 export const STICKER_CATEGORIES = {
+	uploads: "My Stickers",
 	all: "All",
-	// v0.4.0
-	// logos: "Logos",
+	emojis: "Emojis",
 	flags: "Flags",
 	shapes: "Shapes",
 };

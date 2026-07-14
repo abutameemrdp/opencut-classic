@@ -307,6 +307,7 @@ function PreviewCanvas({
 							<div
 								ref={viewportRef}
 								className="relative flex size-full min-h-0 min-w-0 items-center justify-center overflow-hidden"
+								dir="ltr"
 							>
 							<div
 								ref={canvasMountRef}
